@@ -3,8 +3,15 @@ using Plots
 plotlyjs()
 
 #input
-seqs = ("AAGACTAC", "TGCCGTTA", "TTGGATCT", "TCCTCCAA", "CGAGTCGA")
-project = "XX"
+project = "YY"
+#seqs = ("AAGACTAC", "TGCCGTTA", "TTGGATCT", "TCCTCCAA", "CGAGTCGA")
+seqs = """
+AAGACTAC
+TGCCGTTA
+TTGGATCT
+TCCTCCAA
+TCCTCCAA
+""" |> split
 
 #"scores" is "mismatches"
 scores = [score(pairalign(HammingDistance(), i, j)) for i in seqs, j in seqs]
