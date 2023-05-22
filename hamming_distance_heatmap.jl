@@ -3,15 +3,16 @@ using Plots
 plotlyjs()
 
 #input
-project = "YY"
+project = "gwa"
 #seqs = ("AAGACTAC", "TGCCGTTA", "TTGGATCT", "TCCTCCAA", "CGAGTCGA")
 seqs = """
-AAGACTAC
-TGCCGTTA
-TTGGATCT
-TCCTCCAA
-TCCTCCAA
-""" |> split
+CGCTTCCA	CAGTTCGA
+TATTCCTG	TGGAAGCG
+CAAGTTAC	CAGGAATA
+CACATAAACA	GTTTGAAGTA
+ACCAATCGTG	CCCGTGGAGA
+"""
+seqs = replace.(split(seqs, "\n"), "\t" => "")
 
 #"scores" is "mismatches"
 scores = [score(pairalign(HammingDistance(), i, j)) for i in seqs, j in seqs]
@@ -23,7 +24,7 @@ heatmap(scores,
     xticks = (1:nrow, seqs),
     xrot = 90,
     yticks = (1:ncol, seqs),
-    size = (400, 400),
+    size = (2000, 2000),
     linewidth = 5,
     #title = project * " barcode hamming distance"
 )
