@@ -1,11 +1,3 @@
-using BioAlignments
-using Plots
-plotlyjs()
-
-#input setting
-project = "GWA_index1-check"
-remove_collided_indexes = true
-#seqs = ("AAGACTAC", "TGCCGTTA", "TTGGATCT", "TCCTCCAA", "CGAGTCGA")
 # seqs = """
 # AGCTGAAG
 # ATTCCGTG
@@ -102,6 +94,15 @@ remove_collided_indexes = true
 # ACACGACC
 # GGAGAACA
 # CATCAAGT"""
+
+using BioAlignments
+using Plots
+plotlyjs()
+
+#input setting
+project = "GWA-index-check"
+indexes_split = true
+split_cutoff = 1
 seqs = """
 AACTGCAA
 AACGCATT
@@ -127,35 +128,34 @@ CGGATTGC
 CTTATTGC"""
 seqs = replace.(split(seqs, "\n"), "\t" => "")
 
-function dist_plot(scores)
-    heatmap(scores,
+function dist_plot(scores, seqs)
+    nrow, ncol = size(scores)
+    p = heatmap(scores,
         colorbar = false,
         c = palette([:white, :green], 10),
         xticks = (1:nrow, seqs),
         xrot = 90,
         yticks = (1:ncol, seqs),
-        size = (700, 500),
+        size = (400, 400),
         linewidth = 5,
         #title = project * " barcode hamming distance"
     )
     fontsize = 10
     annotate!([(i, j, text(scores[i,j], fontsize, :black)) for i in 1:nrow for j in 1:ncol])
-    #savefig("$project-Collision.html")
+    return p
+    #savefig("test.pdf")
 end
 
 #"scores" is "mismatches"
-scores = [score(pairalign(HammingDistance(), i, j)) for i in seqs, j in seqs]
-nrow, ncol = size(scores)
-dist_plot(scores)
+distance(seqs) = [score(pairalign(HammingDistance(), i, j)) for i in seqs, j in seqs] 
 
-#if remove_collided_indexes == true
-    bad = [pair[1] for pair in findall(x-> x == 1, scores)] |> unique
-    scores_bad = scores[bad, bad]
-    nrow, ncol = size(scores_bad)
-    dist_plot(scores_bad)
+scores = distance(seqs)
+dist_plot(scores, seqs)
 
-    good = [pair[1] for pair in findall(x-> x > 1, scores)] |> unique
-    scores_good = scores[good, good]
-    nrow, ncol = size(scores_good)
-    dist_plot(scores_good)
-#end
+if indexes_split == true
+    bad = [pair[1] for pair in findall(x-> x == split_cutoff, scores)] |> unique
+    dist_plot(distance(seqs[bad]), seqs[bad])
+
+    seqs_good = setdiff(seqs, seqs[bad])
+    dist_plot(distance(seqs_good), seqs_good)
+end
