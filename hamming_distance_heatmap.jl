@@ -1,22 +1,90 @@
 using BioAlignments
 using Plots
-plotlyjs()
+#plotlyjs()
 
 #input setting
 seqs = """
-AACTGCAA
-AACGCATT
-AGTCGCGA
-AGTCACTA
-AACGCTTA
-CTGTAGCC
-GCTCGGTA
-ACACGACC
-GGAGAACA
-CATCAAGT"""
+TCATCCTT
+AACACTCT
+CACCTAGA
+AGTTCATG
+GTTGGTGT
+GCTACGCA
+TCAACTGC
+AAGCGAAT
+GTGTTACA
+CAAGCCAT
+CTCTCGTG
+TCGACAAC
+TCGATGTT
+CAAGGAAG
+ATTGATGC
+TCGCAGAT
+GCAGAGAC
+CTGCGAGA
+CAACCAAC
+ATCATGCG
+TCTGAGTC
+TCGCCTGT
+GCGCAATT
+AGACGCCT
+CAGGCAGA
+TCCGCGAT
+CTCGTACG
+CACACATA
+CGTCAAGA
+TTCGCGCA
+CGACTACG
+GAAGGTAT
+TTGGCATG
+CGAATTCA
+TTAGTTGC
+GATGCCAA
+AGTTGCCG
+GTCCACCT
+ATCAAGGT
+GAACCAGA
+CATGTTCT
+TCACTGTG
+ATTGAGCT
+GATAGAGA
+TCTAGAGC
+GAATCGCA
+CTTCACGT
+CTCCGGTT
+TGTGACTA
+GCTTCCAG
+CATCCTGT
+GTAATACG
+GCCAACAA
+CATGACAC
+TGCAATGC
+CACATTCG
+CAATCCGA
+CATCGACG
+GTGCGCTT
+ATAGCGTT
+GAGTAAGA
+CTGACACA
+ATACGTGT
+GACCGAGT
+GCAGTTAG
+CGTTCGTC
+CGTTAACG
+TCGAGCAT
+GCCGTAAC
+GAGCTGTA
+AGGAAGAT
+CTAACAAG
+CGCTCAGA
+TAACGACA
+ATGCCTAA
+AACGTGAT
+GACTAGTA
+ATTGGCTC
+GATGAATC
+AGCAGGAA"""
 project = "GWA-index-check"
-indexes_split = true
-split_cutoff = 3
 
 seqs = replace.(split(seqs, "\n"), "\t" => "")
 
@@ -28,7 +96,7 @@ function dist_plot(scores, seqs)
         xticks = (1:nrow, seqs),
         xrot = 90,
         yticks = (1:ncol, seqs),
-        size = (400, 400),
+        size = (1800, 1800),
         linewidth = 5,
         #title = project * " barcode hamming distance"
     )
@@ -41,14 +109,15 @@ end
 #"scores" is "mismatches"
 distance(seqs) = [score(pairalign(HammingDistance(), i, j)) for i in seqs, j in seqs] 
 dist_plot(distance(seqs), seqs)
-savefig("test1.html")
+savefig("index_heatmap_v2.pdf")
 
-if indexes_split == true
+indexes_split = true
+split_cutoff = 3
+#if indexes_split == true
     bad = [pair[1] for pair in findall(x-> 0 < x < split_cutoff, distance(seqs))] |> unique |> sort
     dist_plot(distance(seqs[bad]), seqs[bad])
-    savefig("test2.pdf")
+    savefig("index_heatmap_good.pdf")
 
     seqs_good = setdiff(seqs, seqs[bad])
     dist_plot(distance(seqs_good), seqs_good)
-    savefig("test3.pdf")
-end
+    savefig("index_heatmap_bad.pdf")
