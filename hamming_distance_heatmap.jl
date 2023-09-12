@@ -86,7 +86,7 @@ GATGAATC
 AGCAGGAA"""
 project = "GWA-index-check"
 
-seqs = replace.(split(seqs, "\n"), "\t" => "")
+seqs = replace.(split(seqs, "\n"), r"\s+" => "")
 
 function dist_plot(scores, seqs)
     nrow, ncol = size(scores)
